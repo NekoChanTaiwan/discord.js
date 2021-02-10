@@ -1,19 +1,14 @@
 // NekoChanTaiwan Discord.js
-// Discord.js     npm install discord.js        https://discord.js.org/#/docs/main/stable/general/welcome
-// nHentai API    npm install nana-api          https://www.npmjs.com/package/nana-api
-// is-image-url   npm install is-image-url      https://www.npmjs.com/package/is-image-url
+// Discord.js       npm install discord.js        https://discord.js.org/#/docs/main/stable/general/welcome
+// nHentai API      npm install nana-api          https://www.npmjs.com/package/nana-api
+// valid-image-url  npm install valid-image-url   https://www.npmjs.com/package/valid-image-url
 
 'use strict'
 
-// 初始化變量
-
 const Discord = require('discord.js')
-const client = new Discord.Client()
-
 const NanaAPI = require('nana-api')
-const nanaAPI = new NanaAPI
+const isImageURL = require('valid-image-url')
 
-const isImageUrl = require('is-image-url')
 
 // 自定義功能
 const custom = {
@@ -40,7 +35,7 @@ const custom = {
         // 隨機本本指令（字符串）
         randomCommand: 'n',
         // 隨機本本分類過濾（陣列：字符串）
-        randomTagsFilter: ['futanari', 'scat', 'pig man', 'ryona', 'coprohagia', 'spider girl', 'alien', 'pig girl', 'nipple fuck', 'males only', 'pig', 'yaoi', 'insect', 'guro', 'cannibalism', 'eggs'],
+        randomTagsFilter: ['futanari', 'scat', 'pig man', 'ryona', 'coprohagia', 'spider girl', 'alien', 'pig girl', 'nipple fuck', 'males only', 'pig', 'yaoi', 'insect', 'guro', 'cannibalism', 'eggs', 'muscle'],
         // 隨機本本作者過濾（陣列：字符串）
         randomArtistFilter: ['sakamoto kafka'],
         // 隨機本本語言過濾（陣列：字符串）
@@ -48,11 +43,13 @@ const custom = {
     },
 }
 
+const client = new Discord.Client()
+const nanaAPI = new NanaAPI
 const commandPrefix = new RegExp(custom.commandPrefix)
 
 const S = ' [系統] ', E = ' [事件] '
 
-let embed = null, artistName = '', artistUrl = '', tagsName = '', coverUrl = '', language = ''
+let commandStarting = false
 
 console.log(`[${getTime()}]${S}腳本讀取中`)
 
@@ -96,22 +93,33 @@ client.on('ready', () => {
 })
 
 client.on('message', message => {
-    // 指令前綴偵測
-    if (commandPrefix.test(message.content)) {
+    // 指令前綴偵測 及 指令執行狀態
+    if (commandPrefix.test(message.content) && commandStarting === false) {
         // 指令偵測
         switch (message.content) {
             // nHentai 隨機本本
             case `${custom.commandPrefix}${custom.nHentai.randomCommand}`:
+                // 切換指令執行狀態
+                commandStarting = true
+                // 初始化變量
+                let saveMsg = null
+                // 發送通知
+                message.channel.send('正在努力尋找本本...')
+                    .then(msg => saveMsg = msg)
+
                 const nHentaiRandom = () => {
+                    let embed = null, artistName = '', artistUrl = '', tagsName = '', coverUrl = '', language = ''
                     // nHentai API .random()
                     nanaAPI.random()
                         .then(book => {
-                            message.channel.send('正在隨機尋找本本...') // TODO: 提示文字
+
                             // 類型處理
                             for (let value of book.tags) {
                                 if (value.type === 'tag') {
                                     // 過濾分類
                                     if (nHentaiFilter(custom.nHentai.randomTagsFilter, value.name) === true) {
+                                        message.channel.send(`發現過濾類型：${value.name}，努力尋找其他本本中...`)
+                                            .then(msg => msg.delete({ timeout: 1000 }))
                                         return nHentaiRandom()
                                     }
                                     tagsName += `${value.name}, `
@@ -120,6 +128,8 @@ client.on('message', message => {
                                             case 'artist':
                                                 // 過濾作者
                                                 if (nHentaiFilter(custom.nHentai.randomArtistFilter, value.name) === true) {
+                                                    message.channel.send(`發現過濾類型：${value.name}，努力尋找其他本本中...`)
+                                                        .then(msg => msg.delete({ timeout: 1000 }))
                                                     return nHentaiRandom()
                                                 }
                                                 artistName = value.name
@@ -131,6 +141,8 @@ client.on('message', message => {
                                                     value.name === 'chinese') {
                                                          // 過濾語言
                                                         if (nHentaiFilter(custom.nHentai.randomLanguageFilter, value.name) === true) {
+                                                            message.channel.send(`發現過濾類型：${value.name}，努力尋找其他本本中...`)
+                                                                .then(msg => msg.delete({ timeout: 1000 }))
                                                             return nHentaiRandom()
                                                         }
                                                         language = value.name
@@ -144,13 +156,6 @@ client.on('message', message => {
                             artistName = artistName === '' ? '未分類' : artistName
                             artistUrl = artistUrl === '' ? 'https://nhentai.net/' : artistUrl
                             tagsName = tagsName === '' ? '未分類' : tagsName
-
-                            // 圖片檢查
-                            if (isImageUrl(`https://t.nhentai.net/galleries/${book.media_id}/cover.jpg`)) {
-                                coverUrl = `https://t.nhentai.net/galleries/${book.media_id}/cover.jpg`
-                            } else if (isImageUrl(`https://t.nhentai.net/galleries/${book.media_id}/cover.png`)) {
-                                coverUrl = `https://t.nhentai.net/galleries/${book.media_id}/cover.png`
-                            }
 
                             // Embed
                             embed = new Discord.MessageEmbed()
@@ -168,15 +173,34 @@ client.on('message', message => {
                                 .setImage(coverUrl)
                                 .setFooter(`頁數：${book.num_pages}`)
 
-                            // 發送訊息
-                            message.channel.send(embed)
-                                .then(() => console.log(`[${getTime()}]${E}已發送本子：${book.id}`))
-                                .catch(error => console.log(error))
+                            // 圖片檢查
+                            isImageURL(`https://t.nhentai.net/galleries/${book.media_id}/cover.jpg`)
+                                .then(is_image => {
+                                    if (is_image) {
+                                        embed.setImage(`https://t.nhentai.net/galleries/${book.media_id}/cover.jpg`)
+                                        messageSend()
+                                    } else {
+                                        embed.setImage(`https://t.nhentai.net/galleries/${book.media_id}/cover.png`)
+                                        messageSend()
+                                    }
+                                })
 
-                            // 重置變量
-                            artistName = ''
-                            artistUrl = ''
-                            tagsName = ''
+                            // 發送訊息
+                            const messageSend = () => {
+                                message.channel.send(embed)
+                                    .then(() => {
+                                        message.delete() // 刪除用戶輸入指令
+                                        saveMsg.delete() // 刪除通知訊息
+                                        console.log(`[${getTime()}]${E}已發送本子：${book.id}`)
+                                        commandStarting = false // 切換指令執行狀態
+                                    })
+                                    .catch(error => {
+                                        message.delete() // 刪除用戶輸入指令
+                                        saveMsg.delete() // 刪除通知訊息
+                                        console.log(error)
+                                        commandStarting = false // 切換指令執行狀態
+                                    })
+                            }
                         })
                 }
                 nHentaiRandom()
