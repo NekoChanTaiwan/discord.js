@@ -66,7 +66,7 @@ function nHentaiFilter(array, name) {
     if (array.length > 0) {
         for (let i = 0; i < array.length; i++) {
             if (name === array[i]) {
-                console.log(`[${getTime()}]${E} 發現過濾類型：${name}`)
+                console.log(`[${getTime()}]${E}發現過濾類型：${name}`)
                 return true
             }
         }
