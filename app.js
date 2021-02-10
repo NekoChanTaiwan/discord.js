@@ -17,7 +17,9 @@ const isImageUrl = require('is-image-url')
 
 // 自定義功能
 const custom = {
-    // 指令前綴
+    // Token（字符串）
+    token: '',
+    // 指令前綴（字符串）
     commandPrefix: '!',
 
     // 隨機自定狀態
@@ -182,4 +184,4 @@ client.on('message', message => {
 console.log(`[${getTime()}]${S}腳本讀取完成`)
 
 // 登入
-client.login('')
+client.login(custom.token)
