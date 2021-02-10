@@ -104,7 +104,7 @@ client.on('message', message => {
                     // nHentai API .random()
                     nanaAPI.random()
                         .then(book => {
-                            // type 處理
+                            // 類型處理
                             for (let value of book.tags) {
                                 if (value.type === 'tag') {
                                     // 過濾分類
