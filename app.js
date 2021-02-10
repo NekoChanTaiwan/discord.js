@@ -37,13 +37,13 @@ const custom = {
 
     // nHentai功能
     nHentai: {
-        // 隨機本子指令（字符串）
+        // 隨機本本指令（字符串）
         randomCommand: 'n',
-        // 隨機本子分類過濾（陣列：字符串）
+        // 隨機本本分類過濾（陣列：字符串）
         randomTagsFilter: ['futanari', 'scat', 'pig man', 'ryona', 'coprohagia', 'spider girl', 'alien', 'pig girl', 'nipple fuck', 'males only', 'pig', 'yaoi', 'insect', 'guro', 'cannibalism', 'eggs'],
-        // 隨機本子作者過濾（陣列：字符串）
+        // 隨機本本作者過濾（陣列：字符串）
         randomArtistFilter: ['sakamoto kafka'],
-        // 隨機本字語言過濾（陣列：字符串）
+        // 隨機本本語言過濾（陣列：字符串）
         randomLanguageFilter: ['english', 'japanese'],
     },
 }
@@ -73,7 +73,87 @@ function nHentaiFilter(array, name) {
                 return true
             }
         }
+    } else {
+        return false
     }
+}
+// nHentai 隨機本本
+function nHentaiRandom() {
+    // nHentai API .random()
+    nanaAPI.random()
+        .then(book => {
+            // message.channel.send('正在隨機尋找本本...') // TODO: 提示文字
+            // 類型處理
+            for (let value of book.tags) {
+                if (value.type === 'tag') {
+                    // 過濾分類
+                    if (nHentaiFilter(custom.nHentai.randomTagsFilter, value.name) === true) {
+                        return nHentaiRandom()
+                    }
+                    tagsName += `${value.name}, `
+                } else {
+                    switch (value.type) {
+                            case 'artist':
+                                // 過濾作者
+                                if (nHentaiFilter(custom.nHentai.randomArtistFilter, value.name) === true) {
+                                    return nHentaiRandom()
+                                }
+                                artistName = value.name
+                                artistUrl = `https://nhentai.net${value.url}`
+                                break
+                            case 'language':
+                                if (value.name === 'english' ||
+                                    value.name === 'japanese' ||
+                                    value.name === 'chinese') {
+                                            // 過濾語言
+                                        if (nHentaiFilter(custom.nHentai.randomLanguageFilter, value.name) === true) {
+                                            return nHentaiRandom()
+                                        }
+                                        language = value.name
+                                    }
+                                break
+                    }
+                }
+            }
+
+            // 空值檢查
+            artistName = artistName === '' ? '未分類' : artistName
+            artistUrl = artistUrl === '' ? 'https://nhentai.net/' : artistUrl
+            tagsName = tagsName === '' ? '未分類' : tagsName
+
+            // 圖片檢查
+            if (isImageUrl(`https://t.nhentai.net/galleries/${book.media_id}/cover.jpg`)) {
+                coverUrl = `https://t.nhentai.net/galleries/${book.media_id}/cover.jpg`
+            } else if (isImageUrl(`https://t.nhentai.net/galleries/${book.media_id}/cover.png`)) {
+                coverUrl = `https://t.nhentai.net/galleries/${book.media_id}/cover.png`
+            }
+
+            // Embed
+            embed = new Discord.MessageEmbed()
+                .setColor('#ed2553')
+                .setTitle(book.title.pretty)
+                .setURL(`https://nhentai.net/g/${book.id}/`)
+                .setAuthor(`作者：${artistName}`, '', artistUrl)
+                .setThumbnail('https://i.imgur.com/r36VxQt.png')
+                // .setDescription('隨機本子')
+                .addFields(
+                    { name: 'ＩＤ：', value: book.id, inline: true},
+                    { name: '語言：', value: language, inline: true },
+                    { name: '分類：', value: tagsName },
+                )
+                .setImage(coverUrl)
+                .setFooter(`頁數：${book.num_pages}`)
+
+            // 發送訊息
+            message.channel.send(embed)
+                .then(() => console.log(`[${getTime()}]${E}已發送本子：${book.id}`))
+                .catch(error => console.log(error))
+
+            // 重置變量
+            artistName = ''
+            artistUrl = ''
+            tagsName = ''
+        })
 }
 
 
@@ -98,84 +178,8 @@ client.on('message', message => {
     if (commandPrefix.test(message.content)) {
         // 指令偵測
         switch (message.content) {
-            // nHentai 隨機本子
+            // nHentai 隨機本本
             case `${custom.commandPrefix}${custom.nHentai.randomCommand}`:
-                const nHentaiRandom = () => {
-                    // nHentai API .random()
-                    nanaAPI.random()
-                        .then(book => {
-                            // 類型處理
-                            for (let value of book.tags) {
-                                if (value.type === 'tag') {
-                                    // 過濾分類
-                                    if (nHentaiFilter(custom.nHentai.randomTagsFilter, value.name) === true) {
-                                        return nHentaiRandom()
-                                    }
-                                    tagsName += `${value.name}, `
-                                } else {
-                                    switch (value.type) {
-                                            case 'artist':
-                                                // 過濾作者
-                                                if (nHentaiFilter(custom.nHentai.randomArtistFilter, value.name) === true) {
-                                                    return nHentaiRandom()
-                                                }
-                                                artistName = value.name
-                                                artistUrl = `https://nhentai.net${value.url}`
-                                                break
-                                            case 'language':
-                                                if (value.name === 'english' ||
-                                                    value.name === 'japanese' ||
-                                                    value.name === 'chinese') {
-                                                         // 過濾語言
-                                                        if (nHentaiFilter(custom.nHentai.randomLanguageFilter, value.name) === true) {
-                                                            return nHentaiRandom()
-                                                        }
-                                                        language = value.name
-                                                    }
-                                                break
-                                    }
-                                }
-                            }
-
-                            // 空值檢查
-                            artistName = artistName === '' ? '未分類' : artistName
-                            artistUrl = artistUrl === '' ? 'https://nhentai.net/' : artistUrl
-                            tagsName = tagsName === '' ? '未分類' : tagsName
-
-                            // 圖片檢查
-                            if (isImageUrl(`https://t.nhentai.net/galleries/${book.media_id}/cover.jpg`)) {
-                                coverUrl = `https://t.nhentai.net/galleries/${book.media_id}/cover.jpg`
-                            } else if (isImageUrl(`https://t.nhentai.net/galleries/${book.media_id}/cover.png`)) {
-                                coverUrl = `https://t.nhentai.net/galleries/${book.media_id}/cover.png`
-                            }
-
-                            // Embed
-                            embed = new Discord.MessageEmbed()
-                                .setColor('#ed2553')
-                                .setTitle(book.title.pretty)
-                                .setURL(`https://nhentai.net/g/${book.id}/`)
-                                .setAuthor(`作者：${artistName}`, '', artistUrl)
-                                .setThumbnail('https://i.imgur.com/r36VxQt.png')
-                                // .setDescription('隨機本子')
-                                .addFields(
-                                    { name: 'ＩＤ：', value: book.id, inline: true},
-                                    { name: '語言：', value: language, inline: true },
-                                    { name: '分類：', value: tagsName },
-                                )
-                                .setImage(coverUrl)
-                                .setFooter(`頁數：${book.num_pages}`)
-
-                            // 發送訊息
-                            message.channel.send(embed)
-                                .then(() => console.log(`[${getTime()}]${E}已發送本子：${book.id}`))
-                                .catch(error => console.log(error))
-
-                            // 重置變量
-                            artistName = ''
-                            artistUrl = ''
-                            tagsName = ''
-                        })
-                }
                 nHentaiRandom()
                 break
         }
