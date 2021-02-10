@@ -19,19 +19,20 @@ const isImageUrl = require('is-image-url')
 const custom = {
     // Token（字符串）
     token: '',
+
     // 指令前綴（字符串）
     commandPrefix: '!',
 
     // 隨機自定狀態
     randomActivity: {
         // 啟用（布林值）
-        Enable: true,
+        enable: true,
         // 類型（字符串）
-        Type: 'COMPETING',
+        type: 'COMPETING',
         // 內容（陣列：字符串）
-        Array: ['NekoChan 的 肉便器', 'NekoChan 的 性奴隸', 'NekoChan 的 小母狗', 'NekoChan 的 飛機杯'],
-        // 切換時間（單位：秒）
-        SwitchTime: 60,
+        array: ['NekoChan 的 肉便器', 'NekoChan 的 性奴隸', 'NekoChan 的 小母狗', 'NekoChan 的 飛機杯'],
+        // 切換時間（數字：單位-秒）
+        switchTime: 60,
     },
 
     // nHentai功能
@@ -42,7 +43,7 @@ const custom = {
         randomTagsFilter: ['futanari', 'scat', 'pig man', 'ryona', 'coprohagia', 'spider girl', 'alien', 'pig girl', 'nipple fuck', 'males only', 'pig', 'yaoi', 'insect', 'guro', 'cannibalism', 'eggs'],
         // 隨機本子作者過濾（陣列：字符串）
         randomArtistFilter: ['sakamoto kafka'],
-        // 隨機本字語言過濾（陣列字符串）
+        // 隨機本字語言過濾（陣列：字符串）
         randomLanguageFilter: ['english', 'japanese'],
     },
 }
@@ -82,14 +83,14 @@ client.on('ready', () => {
 
     // 隨機自定狀態
     const SetRandomActivity = () => {
-        client.user.setActivity(custom.randomActivity.Array[getRandomInt(custom.randomActivity.Array.length)], {type: custom.randomActivity.Type})
+        client.user.setActivity(custom.randomActivity.array[getRandomInt(custom.randomActivity.array.length)], {type: custom.randomActivity.type})
             .then(presence => console.log(`[${getTime()}]${E}已設置狀態：${presence.activities[0].name}`))
             .catch(error => console.log(error))
         setTimeout(() => {
             SetRandomActivity()
-        }, custom.randomActivity.SwitchTime * 1000)
+        }, custom.randomActivity.switchTime * 1000)
     }
-    custom.randomActivity.Enable ? SetRandomActivity() : null
+    custom.randomActivity.enable ? SetRandomActivity() : null
 })
 
 client.on('message', message => {
