@@ -8,16 +8,11 @@
 const Discord = require('discord.js')
 const NanaAPI = require('nana-api')
 const isImageURL = require('valid-image-url')
+const { token, prefix } = require('./config.json')
 
 
 // 自定義功能
 const custom = {
-    // Token（字符串）
-    token: '',
-
-    // 指令前綴（字符串）
-    commandPrefix: '!',
-
     // 隨機自定狀態
     randomActivity: {
         // 啟用（布林值）
@@ -32,20 +27,30 @@ const custom = {
 
     // nHentai功能
     nHentai: {
-        // 隨機本本指令（字符串）
-        randomCommand: 'n',
-        // 隨機本本分類過濾（陣列：字符串）
-        randomTagsFilter: ['futanari', 'scat', 'pig man', 'ryona', 'coprohagia', 'spider girl', 'alien', 'pig girl', 'nipple fuck', 'males only', 'pig', 'yaoi', 'insect', 'guro', 'cannibalism', 'eggs', 'muscle'],
-        // 隨機本本作者過濾（陣列：字符串）
-        randomArtistFilter: ['sakamoto kafka'],
-        // 隨機本本語言過濾（陣列：字符串）
-        randomLanguageFilter: ['english', 'japanese'],
+        // 隨機本本
+        random: {
+            // 指令（字符串）
+            command: 'random',
+            // 簡寫指令（字符串）
+            shortCommand: 'r',
+            // 黑名單功能
+            Blacklist: {
+                // 啟用（布林值）
+                enable: true,
+                // 分類（陣列：字符串）
+                tags: ['futanari', 'scat', 'pig man', 'ryona', 'coprohagia', 'spider girl', 'alien', 'pig girl', 'nipple fuck', 'males only', 'pig', 'yaoi', 'insect', 'guro', 'cannibalism', 'eggs', 'muscle'],
+                // 作者（陣列：字符串）
+                artists: ['sakamoto kafka'],
+                // 語言（陣列：字符串）
+                languages: ['english', 'japanese'],
+            }
+        },
     },
 }
 
 const client = new Discord.Client()
 const nanaAPI = new NanaAPI
-const commandPrefix = new RegExp(custom.commandPrefix)
+const commandPrefix = new RegExp(prefix)
 
 const S = ' [系統] ', E = ' [事件] '
 
@@ -62,11 +67,11 @@ function getTime() {
     return new Date().toLocaleString()
 }
 // nHentai 過濾
-function nHentaiFilter(array, name) {
+function nHentaiBlacklistFilter(array, name) {
     if (array.length > 0) {
         for (let i = 0; i < array.length; i++) {
             if (name === array[i]) {
-                console.log(`[${getTime()}]${E}發現過濾類型：${name}`)
+                console.log(`[${getTime()}]${E}發現黑名單類型：${name}`)
                 return true
             }
         }
@@ -98,38 +103,46 @@ client.on('message', message => {
         // 指令偵測
         switch (message.content) {
             // nHentai 隨機本本
-            case `${custom.commandPrefix}${custom.nHentai.randomCommand}`:
+            case `${prefix}${custom.nHentai.random.command}`:
+            case `${prefix}${custom.nHentai.random.shortCommand}`:
                 // 切換指令執行狀態
                 commandStarting = true
                 // 初始化變量
                 let saveMsg = null
                 // 發送通知
-                message.channel.send('正在努力尋找本本...')
+                message.channel.send(`\u0060\u0060\u0060[${getTime()}] 正在努力尋找本本...\u0060\u0060\u0060`)
                     .then(msg => saveMsg = msg)
 
                 const nHentaiRandom = () => {
-                    let embed = null, artistName = '', artistUrl = '', tagsName = '', coverUrl = '', language = ''
+                    // 初始化變量
+                    let embed = null,
+                        blacklistEnable = '',
+                        artistName = '',
+                        artistUrl = '',
+                        tagsName = '',
+                        coverUrl = '',
+                        language = ''
+
                     // nHentai API .random()
                     nanaAPI.random()
                         .then(book => {
-
                             // 類型處理
                             for (let value of book.tags) {
                                 if (value.type === 'tag') {
-                                    // 過濾分類
-                                    if (nHentaiFilter(custom.nHentai.randomTagsFilter, value.name) === true) {
-                                        message.channel.send(`發現過濾類型：${value.name}，努力尋找其他本本中...`)
-                                            .then(msg => msg.delete({ timeout: 1000 }))
+                                    // 過濾黑名單分類
+                                    if (custom.nHentai.random.Blacklist.enable === true &&
+                                        nHentaiBlacklistFilter(custom.nHentai.random.Blacklist.tags, value.name) === true) {
+                                        saveMsg.edit(`\u0060\u0060\u0060[${getTime()}] 發現黑名單類型：${value.name}，努力尋找其他本本中...\u0060\u0060\u0060`)
                                         return nHentaiRandom()
                                     }
                                     tagsName += `${value.name}, `
                                 } else {
                                     switch (value.type) {
                                             case 'artist':
-                                                // 過濾作者
-                                                if (nHentaiFilter(custom.nHentai.randomArtistFilter, value.name) === true) {
-                                                    message.channel.send(`發現過濾類型：${value.name}，努力尋找其他本本中...`)
-                                                        .then(msg => msg.delete({ timeout: 1000 }))
+                                                // 過濾黑名單作者
+                                                if (custom.nHentai.random.Blacklist.enable === true &&
+                                                    nHentaiBlacklistFilter(custom.nHentai.random.Blacklist.artists, value.name) === true) {
+                                                    saveMsg.edit(`\u0060\u0060\u0060[${getTime()}] 發現黑名單類型：${value.name}，努力尋找其他本本中...\u0060\u0060\u0060`)
                                                     return nHentaiRandom()
                                                 }
                                                 artistName = value.name
@@ -139,10 +152,10 @@ client.on('message', message => {
                                                 if (value.name === 'english' ||
                                                     value.name === 'japanese' ||
                                                     value.name === 'chinese') {
-                                                         // 過濾語言
-                                                        if (nHentaiFilter(custom.nHentai.randomLanguageFilter, value.name) === true) {
-                                                            message.channel.send(`發現過濾類型：${value.name}，努力尋找其他本本中...`)
-                                                                .then(msg => msg.delete({ timeout: 1000 }))
+                                                         // 過濾黑名單語言
+                                                        if (custom.nHentai.random.Blacklist.enable === true &&
+                                                            nHentaiBlacklistFilter(custom.nHentai.random.Blacklist.languages, value.name) === true) {
+                                                            saveMsg.edit(`\u0060\u0060\u0060[${getTime()}] 發現黑名單類型：${value.name}，努力尋找其他本本中...\u0060\u0060\u0060`)
                                                             return nHentaiRandom()
                                                         }
                                                         language = value.name
@@ -157,6 +170,9 @@ client.on('message', message => {
                             artistUrl = artistUrl === '' ? 'https://nhentai.net/' : artistUrl
                             tagsName = tagsName === '' ? '未分類' : tagsName
 
+                            // 過濾黑名單檢查
+                            blacklistEnable = custom.nHentai.random.Blacklist.enable === true ? '過濾黑名單：已啟用' : '過濾黑名單：已關閉'
+
                             // Embed
                             embed = new Discord.MessageEmbed()
                                 .setColor('#ed2553')
@@ -164,7 +180,7 @@ client.on('message', message => {
                                 .setURL(`https://nhentai.net/g/${book.id}/`)
                                 .setAuthor(`作者：${artistName}`, '', artistUrl)
                                 .setThumbnail('https://i.imgur.com/r36VxQt.png')
-                                // .setDescription('隨機本子')
+                                .setDescription(blacklistEnable)
                                 .addFields(
                                     { name: 'ＩＤ：', value: book.id, inline: true},
                                     { name: '語言：', value: language, inline: true },
@@ -212,4 +228,4 @@ client.on('message', message => {
 console.log(`[${getTime()}]${S}腳本讀取完成`)
 
 // 登入
-client.login(custom.token)
+client.login(token)
