@@ -229,3 +229,4 @@ console.log(`[${getTime()}]${S}腳本讀取完成`)
 
 // 登入
 client.login(token)
+    .catch(error => console.log(error))
