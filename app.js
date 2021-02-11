@@ -107,16 +107,25 @@ client.on('message', message => {
             case `${prefix}${custom.nHentai.random.shortCommand}`:
                 // 切換指令執行狀態
                 commandStarting = true
-                // 初始化變量
-                let saveMsg = null
-                // 發送通知
-                message.channel.send(`\u0060\u0060\u0060[${getTime()}] 正在努力尋找本本...\u0060\u0060\u0060`)
-                    .then(msg => saveMsg = msg)
 
+                // 初始化變量
+                let nHentaiRandomName = 'nHentai - 隨機本本',
+                    saveMsg = null
+
+                // 發送通知
+                message.channel.send(`\u0060\u0060\u0060[${getTime()}] 已偵測到指令：${nHentaiRandomName}\u0060\u0060\u0060`)
+                    .then(msg => {
+                        console.log(`[${getTime()}]${E}已偵測到指令：${nHentaiRandomName}`)
+                        msg.edit(`\u0060\u0060\u0060[${getTime()}] [${nHentaiRandomName}] 正在努力尋找本本...\u0060\u0060\u0060`)
+                        saveMsg = msg
+                    })
+
+                // 主要函式
                 const nHentaiRandom = () => {
                     // 初始化變量
                     let embed = null,
                         blacklistEnable = '',
+                        foundBlacklistText = '',
                         artistName = '',
                         artistUrl = '',
                         tagsName = '',
@@ -128,11 +137,12 @@ client.on('message', message => {
                         .then(book => {
                             // 類型處理
                             for (let value of book.tags) {
+                                foundBlacklistText = `\u0060\u0060\u0060[${getTime()}] [${nHentaiRandomName}] 發現黑名單類型：${value.name}，努力尋找其他本本中...\u0060\u0060\u0060`
                                 if (value.type === 'tag') {
                                     // 過濾黑名單分類
                                     if (custom.nHentai.random.Blacklist.enable === true &&
                                         nHentaiBlacklistFilter(custom.nHentai.random.Blacklist.tags, value.name) === true) {
-                                        saveMsg.edit(`\u0060\u0060\u0060[${getTime()}] 發現黑名單類型：${value.name}，努力尋找其他本本中...\u0060\u0060\u0060`)
+                                        saveMsg.edit(foundBlacklistText)
                                         return nHentaiRandom()
                                     }
                                     tagsName += `${value.name}, `
@@ -142,7 +152,7 @@ client.on('message', message => {
                                                 // 過濾黑名單作者
                                                 if (custom.nHentai.random.Blacklist.enable === true &&
                                                     nHentaiBlacklistFilter(custom.nHentai.random.Blacklist.artists, value.name) === true) {
-                                                    saveMsg.edit(`\u0060\u0060\u0060[${getTime()}] 發現黑名單類型：${value.name}，努力尋找其他本本中...\u0060\u0060\u0060`)
+                                                    saveMsg.edit(foundBlacklistText)
                                                     return nHentaiRandom()
                                                 }
                                                 artistName = value.name
@@ -155,7 +165,7 @@ client.on('message', message => {
                                                          // 過濾黑名單語言
                                                         if (custom.nHentai.random.Blacklist.enable === true &&
                                                             nHentaiBlacklistFilter(custom.nHentai.random.Blacklist.languages, value.name) === true) {
-                                                            saveMsg.edit(`\u0060\u0060\u0060[${getTime()}] 發現黑名單類型：${value.name}，努力尋找其他本本中...\u0060\u0060\u0060`)
+                                                            saveMsg.edit(foundBlacklistText)
                                                             return nHentaiRandom()
                                                         }
                                                         language = value.name
@@ -164,6 +174,9 @@ client.on('message', message => {
                                     }
                                 }
                             }
+
+                            // 刪除通知訊息
+                            saveMsg.delete()
 
                             // 空值檢查
                             artistName = artistName === '' ? '未分類' : artistName
@@ -187,7 +200,7 @@ client.on('message', message => {
                                     { name: '分類：', value: tagsName },
                                 )
                                 .setImage(coverUrl)
-                                .setFooter(`頁數：${book.num_pages}`)
+                                .setFooter(`頁數：${book.num_pages}\n${nHentaiRandomName}　指令：${prefix}${custom.nHentai.random.shortCommand} 或 ${prefix}${custom.nHentai.random.command}`)
 
                             // 圖片檢查
                             isImageURL(`https://t.nhentai.net/galleries/${book.media_id}/cover.jpg`)
@@ -205,20 +218,19 @@ client.on('message', message => {
                             const messageSend = () => {
                                 message.channel.send(embed)
                                     .then(() => {
-                                        message.delete() // 刪除用戶輸入指令
-                                        saveMsg.delete() // 刪除通知訊息
                                         console.log(`[${getTime()}]${E}已發送本子：${book.id}`)
                                         commandStarting = false // 切換指令執行狀態
                                     })
                                     .catch(error => {
-                                        message.delete() // 刪除用戶輸入指令
-                                        saveMsg.delete() // 刪除通知訊息
                                         console.log(error)
                                         commandStarting = false // 切換指令執行狀態
                                     })
                             }
                         })
                 }
+                // 刪除用戶輸入指令
+                message.delete()
+                // 開始執行函式
                 nHentaiRandom()
                 break
         }
