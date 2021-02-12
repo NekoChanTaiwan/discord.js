@@ -1,4 +1,34 @@
 {
     "token": "",
-    "prefix": "!"
+    "prefix": "!",
+
+    "randomActivity": {
+        "enable": true,
+        "type": "COMPETING",
+        "status": ["NekoChan 的 肉便器", "NekoChan 的 性奴隸", "NekoChan 的 小母狗", "NekoChan 的 飛機杯"],
+        "switchTime": 5
+    },
+
+    "nHentai": {
+        "find": {
+            "name":"nHentai - 尋找本本"
+        },
+        "random": {
+            "name": "nHentai - 隨機本本",
+            "command": "random",
+            "shortCommand": "r",
+            "Blacklist": {
+                "enable": true,
+                "tags": ["futanari", "scat", "pig man", "ryona", "coprohagia", "spider girl", "alien", "pig girl", "nipple fuck", "males only", "pig", "yaoi", "insect", "guro", "cannibalism", "eggs", "big breasts", "drugs", "pregnant", "bestiality"],
+                "artists": ["sakamoto kafka"],
+                "languages": ["english", "japanese"]
+            }
+        }
+    },
+
+    "text": {
+        "system": " [系統] ",
+        "event": " [事件] ",
+        "error": " [錯誤] "
+    }
 }
