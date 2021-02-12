@@ -1,6 +1,6 @@
 'use strict'
 
-const { randomActivity, nHentai, text } = require('../config.json')
+const { randomActivity, commands, text } = require('../config.json')
 const { getRandomInt, getTime } = require('./mix')
 
 // 隨機自定狀態
@@ -15,12 +15,12 @@ const setRandomActivity = client => {
 
 // 定時發送隨機本本
 const randomBookTime = (client) => {
-    if (!nHentai.randomBookTime.enable) return
-    client.channels.cache.get(nHentai.randomBookTime.channel).send('!random')
+    if (!commands.nHentai.randomBookTime.enable) return
+    client.channels.cache.get(commands.nHentai.randomBookTime.channel).send('!random')
         .then(() => console.log(`[${getTime()}]${text.event}定時發送隨機本本`))
     setTimeout(() => {
         randomBookTime(client)
-    }, nHentai.randomBookTime.sendSecTime * 1000)
+    }, commands.nHentai.randomBookTime.sendSecTime * 1000)
 }
 
 module.exports = {

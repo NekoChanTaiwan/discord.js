@@ -1,6 +1,6 @@
 'use strict'
 
-const { prefix, nHentai, text } = require('../config.json')
+const { prefix, commands, text } = require('../config.json')
 const { nHentaiEmbed } = require('../functions/nHentai')
 const { getTime } = require('../functions/mix')
 
@@ -17,7 +17,7 @@ let saveMsg = null,
     language = ''
 
 module.exports = {
-	name: nHentai.find.command,
+	name: commands.nHentai.find.command,
 	cooldown: 10,
     args: true,
 	callback(message, args) {
@@ -28,10 +28,10 @@ module.exports = {
 
 
         // 發送通知
-        message.channel.send(`\u0060\u0060\u0060[${getTime()}] 已偵測到指令：${nHentai.find.name}\u0060\u0060\u0060`)
+        message.channel.send(`\u0060\u0060\u0060[${getTime()}] 已偵測到指令：${commands.nHentai.find.description}\u0060\u0060\u0060`)
         .then(msg => {
-            console.log(`[${getTime()}]${text.event}已偵測到指令：${nHentai.find.name}`)
-            msg.edit(`\u0060\u0060\u0060[${getTime()}] [${nHentai.find.name}] 正在努力尋找本本...\u0060\u0060\u0060`)
+            console.log(`[${getTime()}]${text.event}已偵測到指令：${commands.nHentai.find.description}`)
+            msg.edit(`\u0060\u0060\u0060[${getTime()}] [${commands.nHentai.find.description}] 正在努力尋找本本...\u0060\u0060\u0060`)
             saveMsg = msg
         })
         nanaAPI.g(id)
@@ -47,7 +47,7 @@ module.exports = {
                     switch (value.type) {
                             case 'artist':
                                 artistName = value.name
-                                artistUrl = `https://nhentai.net${value.url}`
+                                artistUrl = `https://nHentai.net${value.url}`
                                 break
                             case 'language':
                                 if (value.name === 'english' ||
@@ -62,18 +62,18 @@ module.exports = {
 
             // 空值檢查
             artistName = artistName === '' ? '無' : artistName
-            artistUrl = artistUrl === '' ? 'https://nhentai.net/' : artistUrl
+            artistUrl = artistUrl === '' ? 'https://nHentai.net/' : artistUrl
             tagsName = tagsName === '' ? '無' : tagsName
 
             saveMsg.delete() // 刪除通知訊息
                 .then(() => {
-                    nHentaiEmbed(book.title.pretty, book.id, artistName, artistUrl, blacklistEnable, language, tagsName, book.num_pages, nHentai.find.name, prefix, `${nHentai.find.command} ${book.id}`, book.media_id, message)
+                    nHentaiEmbed(book.title.pretty, book.id, artistName, artistUrl, blacklistEnable, language, tagsName, book.num_pages, commands.nHentai.find.description, prefix, `${commands.nHentai.find.command} ${book.id}`, book.media_id, message)
                 })
 
 
         })
         .catch(error => {
-            saveMsg.edit(`\u0060\u0060\u0060[${getTime()}] [${nHentai.find.name}] 請輸入有效的ＩＤ\u0060\u0060\u0060`)
+            saveMsg.edit(`\u0060\u0060\u0060[${getTime()}] [${commands.nHentai.find.description}] 請輸入有效的ＩＤ\u0060\u0060\u0060`)
             saveMsg.delete({ timeout: 5000 }) // 移除通知
             console.log(`[${getTime()}]${text.error}無效的ＩＤ：${id}`)
             console.log(error)

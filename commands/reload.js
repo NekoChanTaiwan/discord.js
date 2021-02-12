@@ -1,8 +1,11 @@
 'use strict'
 
+const { commands } = require('../config.json')
+
 module.exports = {
-	name: 'reload',
-	description: '重新讀取指定指令',
+	name: commands.reload.command,
+	description: commands.reload.description,
+	cooldown: 3,
 	args: true,
 	callback(message, args) {
 		const commandName = args[0].toLowerCase()

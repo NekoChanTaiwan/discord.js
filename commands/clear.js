@@ -1,11 +1,11 @@
 'use strict'
 
-const { text } = require('../config.json')
+const { commands, text } = require('../config.json')
 const { getTime } = require('../functions/mix')
 
 module.exports = {
-	name: 'clear',
-    description: '刪除文字',
+	name: commands.clear.command,
+    description: commands.clear.description,
 	cooldown: 3,
     args: true,
 	async callback(message, args) {

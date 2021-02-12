@@ -24,7 +24,7 @@ function nHentaiEmbed(title, bookId, artistName, artistUrl, blacklistEnable = ''
     let embed = new Discord.MessageEmbed()
         .setColor('#ed2553')
         .setTitle(title)
-        .setURL(`https://nhentai.net/g/${bookId}/`)
+        .setURL(`https://nHentai.net/g/${bookId}/`)
         .setAuthor(`作者：${artistName}`, '', artistUrl)
         .setThumbnail('https://i.imgur.com/r36VxQt.png')
         .setDescription(blacklistEnable)
@@ -36,13 +36,13 @@ function nHentaiEmbed(title, bookId, artistName, artistUrl, blacklistEnable = ''
         .setFooter(`頁數：${pages}\n${commandName}　指令：${prefix}${command}`)
 
     // 圖片檢查
-    isImageURL(`https://t.nhentai.net/galleries/${mediaId}/cover.jpg`)
+    isImageURL(`https://t.nHentai.net/galleries/${mediaId}/cover.jpg`)
         .then(is_image => {
             if (is_image) {
-                embed.setImage(`https://t.nhentai.net/galleries/${mediaId}/cover.jpg`)
+                embed.setImage(`https://t.nHentai.net/galleries/${mediaId}/cover.jpg`)
                 messageSend()
             } else {
-                embed.setImage(`https://t.nhentai.net/galleries/${mediaId}/cover.png`)
+                embed.setImage(`https://t.nHentai.net/galleries/${mediaId}/cover.png`)
                 messageSend()
             }
         })

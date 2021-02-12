@@ -23,6 +23,9 @@ for (const file of commandFiles) {
 	client.commands.set(command.name, command)
 }
 
+// 待執行指令
+let commandArray = []
+
 // 就緒事件
 client.on('ready', () => {
     console.log(`[${getTime()}]${text.event}已登入 ${client.user.tag}`)

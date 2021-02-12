@@ -1,6 +1,6 @@
 'use strict'
 
-const { prefix, nHentai, text } = require('../config.json')
+const { prefix, commands, text } = require('../config.json')
 const { nHentaiBlacklistFilter, nHentaiEmbed } = require('../functions/nHentai')
 const { getTime } = require('../functions/mix')
 
@@ -18,15 +18,15 @@ let saveMsg = null,
     language = ''
 
 module.exports = {
-	name: nHentai.random.command,
+	name: commands.nHentai.random.command,
     description: 'nHentai 隨機本本',
 	cooldown: 10,
 	callback(message) {
 		// 發送通知
-        message.channel.send(`\u0060\u0060\u0060[${getTime()}] 已偵測到指令：${nHentai.random.name}\u0060\u0060\u0060`)
+        message.channel.send(`\u0060\u0060\u0060[${getTime()}] 已偵測到指令：${commands.nHentai.random.description}\u0060\u0060\u0060`)
             .then(msg => {
-                console.log(`[${getTime()}]${text.event}已偵測到指令：${nHentai.random.name}`)
-                msg.edit(`\u0060\u0060\u0060[${getTime()}] [${nHentai.random.name}] 正在努力尋找本本...\u0060\u0060\u0060`)
+                console.log(`[${getTime()}]${text.event}已偵測到指令：${commands.nHentai.random.description}`)
+                msg.edit(`\u0060\u0060\u0060[${getTime()}] [${commands.nHentai.random.description}] 正在努力尋找本本...\u0060\u0060\u0060`)
                 saveMsg = msg
             })
 
@@ -40,11 +40,11 @@ module.exports = {
                 .then(book => {
                     // 類型處理
                     for (let value of book.tags) {
-                        foundBlacklistText = `\u0060\u0060\u0060[${getTime()}] [${nHentai.random.name}] 發現黑名單類型：${value.name}，努力尋找其他本本中...\u0060\u0060\u0060`
+                        foundBlacklistText = `\u0060\u0060\u0060[${getTime()}] [${commands.nHentai.random.description}] 發現黑名單類型：${value.name}，努力尋找其他本本中...\u0060\u0060\u0060`
                         if (value.type === 'tag') {
                             // 過濾黑名單標籤
-                            if (nHentai.random.Blacklist.enable === true &&
-                                nHentaiBlacklistFilter(nHentai.random.Blacklist.tags, value.name) === true) {
+                            if (commands.nHentai.random.Blacklist.enable === true &&
+                                nHentaiBlacklistFilter(commands.nHentai.random.Blacklist.tags, value.name) === true) {
                                 return saveMsg.edit(foundBlacklistText)
                                         .then(() => {
                                             nHentaiRandom()
@@ -55,23 +55,23 @@ module.exports = {
                             switch (value.type) {
                                     case 'artist':
                                         // 過濾黑名單作者
-                                        if (nHentai.random.Blacklist.enable === true &&
-                                            nHentaiBlacklistFilter(nHentai.random.Blacklist.artists, value.name) === true) {
+                                        if (commands.nHentai.random.Blacklist.enable === true &&
+                                            nHentaiBlacklistFilter(commands.nHentai.random.Blacklist.artists, value.name) === true) {
                                             return saveMsg.edit(foundBlacklistText)
                                                     .then(() => {
                                                         nHentaiRandom()
                                                     })
                                         }
                                         artistName = value.name
-                                        artistUrl = `https://nhentai.net${value.url}`
+                                        artistUrl = `https://nHentai.net${value.url}`
                                         break
                                     case 'language':
                                         if (value.name === 'english' ||
                                             value.name === 'japanese' ||
                                             value.name === 'chinese') {
                                                     // 過濾黑名單語言
-                                                if (nHentai.random.Blacklist.enable === true &&
-                                                    nHentaiBlacklistFilter(nHentai.random.Blacklist.languages, value.name) === true) {
+                                                if (commands.nHentai.random.Blacklist.enable === true &&
+                                                    nHentaiBlacklistFilter(commands.nHentai.random.Blacklist.languages, value.name) === true) {
                                                     return saveMsg.edit(foundBlacklistText)
                                                             .then(() => {
                                                                 nHentaiRandom()
@@ -86,17 +86,17 @@ module.exports = {
 
                     // 空值檢查
                     artistName = artistName === '' ? '無' : artistName
-                    artistUrl = artistUrl === '' ? 'https://nhentai.net/' : artistUrl
+                    artistUrl = artistUrl === '' ? 'https://nHentai.net/' : artistUrl
                     tagsName = tagsName === '' ? '無' : tagsName
 
                     // 過濾黑名單檢查
-                    blacklistEnable = nHentai.random.Blacklist.enable === true ? '過濾黑名單：已啟用' : '過濾黑名單：已關閉'
+                    blacklistEnable = commands.nHentai.random.Blacklist.enable === true ? '過濾黑名單：已啟用' : '過濾黑名單：已關閉'
 
                     // 刪除通知訊息
                     saveMsg.delete()
                         .then(() => {
                             // DiscordEmbed + 發送訊息 + 切換指令狀態
-                            nHentaiEmbed(book.title.pretty, book.id, artistName, artistUrl, blacklistEnable, language, tagsName, book.num_pages, nHentai.random.name, prefix, nHentai.random.command, book.media_id, message)
+                            nHentaiEmbed(book.title.pretty, book.id, artistName, artistUrl, blacklistEnable, language, tagsName, book.num_pages, commands.nHentai.random.description, prefix, commands.nHentai.random.command, book.media_id, message)
                         })
 
                 })
