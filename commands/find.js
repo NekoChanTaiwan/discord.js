@@ -20,7 +20,7 @@ module.exports = {
 	name: nHentai.find.command,
 	cooldown: 10,
     args: true,
-	execute(message, args) {
+	callback(message, args) {
         let id = ''
         for (let i = 0; i < args[0].length; i++) {
             id += args[0][i]
@@ -36,7 +36,7 @@ module.exports = {
         })
         nanaAPI.g(id)
         .then(book => {
-            // 重置分類
+            // 重置標籤
             tagsName = ''
 
             // 類型處理
@@ -61,9 +61,9 @@ module.exports = {
             }
 
             // 空值檢查
-            artistName = artistName === '' ? '未分類' : artistName
+            artistName = artistName === '' ? '無' : artistName
             artistUrl = artistUrl === '' ? 'https://nhentai.net/' : artistUrl
-            tagsName = tagsName === '' ? '未分類' : tagsName
+            tagsName = tagsName === '' ? '無' : tagsName
 
             saveMsg.delete() // 刪除通知訊息
                 .then(() => {

@@ -4,7 +4,7 @@ module.exports = {
 	name: 'reload',
 	description: '重新讀取指定指令',
 	args: true,
-	execute(message, args) {
+	callback(message, args) {
 		const commandName = args[0].toLowerCase()
 		const command = message.client.commands.get(commandName)
 			|| message.client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName))

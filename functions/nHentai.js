@@ -31,7 +31,7 @@ function nHentaiEmbed(title, bookId, artistName, artistUrl, blacklistEnable = ''
         .addFields(
             { name: 'ＩＤ：', value: bookId, inline: true},
             { name: '語言：', value: language, inline: true },
-            { name: '分類：', value: tagsName },
+            { name: '標籤：', value: tagsName },
         )
         .setFooter(`頁數：${pages}\n${commandName}　指令：${prefix}${command}`)
 
@@ -50,7 +50,10 @@ function nHentaiEmbed(title, bookId, artistName, artistUrl, blacklistEnable = ''
     // 發送訊息
     const messageSend = () => {
         message.channel.send(embed)
-            .then(() => {
+            .then(msg => {
+                // 新增表情反應
+                msg.react(message.guild.emojis.cache.get('801670133537964032')) // <:matsuri_1:801670133537964032>
+                    .then(() => msg.react(message.guild.emojis.cache.get('809421688336023594'))) // <:tanjiro:809421688336023594>cls
                 console.log(`[${getTime()}]${text.event}已發送本子：${bookId}`)
             })
             .catch(error => {

@@ -21,7 +21,7 @@ module.exports = {
 	name: nHentai.random.command,
     description: 'nHentai 隨機本本',
 	cooldown: 10,
-	execute(message) {
+	callback(message) {
 		// 發送通知
         message.channel.send(`\u0060\u0060\u0060[${getTime()}] 已偵測到指令：${nHentai.random.name}\u0060\u0060\u0060`)
             .then(msg => {
@@ -32,7 +32,7 @@ module.exports = {
 
         // 主要函式
         const nHentaiRandom = () => {
-            // 重置分類
+            // 重置標籤
             tagsName = '',
 
             // nHentai API .random()
@@ -42,7 +42,7 @@ module.exports = {
                     for (let value of book.tags) {
                         foundBlacklistText = `\u0060\u0060\u0060[${getTime()}] [${nHentai.random.name}] 發現黑名單類型：${value.name}，努力尋找其他本本中...\u0060\u0060\u0060`
                         if (value.type === 'tag') {
-                            // 過濾黑名單分類
+                            // 過濾黑名單標籤
                             if (nHentai.random.Blacklist.enable === true &&
                                 nHentaiBlacklistFilter(nHentai.random.Blacklist.tags, value.name) === true) {
                                 return saveMsg.edit(foundBlacklistText)
@@ -85,9 +85,9 @@ module.exports = {
                     }
 
                     // 空值檢查
-                    artistName = artistName === '' ? '未分類' : artistName
+                    artistName = artistName === '' ? '無' : artistName
                     artistUrl = artistUrl === '' ? 'https://nhentai.net/' : artistUrl
-                    tagsName = tagsName === '' ? '未分類' : tagsName
+                    tagsName = tagsName === '' ? '無' : tagsName
 
                     // 過濾黑名單檢查
                     blacklistEnable = nHentai.random.Blacklist.enable === true ? '過濾黑名單：已啟用' : '過濾黑名單：已關閉'

@@ -3,7 +3,7 @@
 module.exports = {
 	name: 'meow',
 	cooldown: 3,
-	execute(message) {
+	callback(message) {
 		message.channel.send('喵?')
 	}
 }

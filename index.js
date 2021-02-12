@@ -8,8 +8,9 @@
 const { token, prefix, text } = require('./config.json')
 const fs = require('fs')
 const Discord = require('discord.js')
-const { setRandomActivity } = require('./functions/ready')
 const { getTime } = require('./functions/mix')
+const { setRandomActivity, randomBookTime } = require('./functions/ready')
+const { imageMessage } = require('./functions/message')
 
 const client = new Discord.Client()
 const cooldowns = new Discord.Collection()
@@ -27,12 +28,18 @@ client.on('ready', () => {
     console.log(`[${getTime()}]${text.event}已登入 ${client.user.tag}`)
     // 設定隨機狀態
     setRandomActivity(client)
+    // 定時發送隨機本本
+    randomBookTime(client)
 })
 
-// 訊息事件
+// 訊息事件訊息
 client.on('message', message => {
+    // 回復圖片
+    imageMessage(message)
+
     // 指令
-	if (!message.content.startsWith(prefix) || message.author.bot) return
+	// if (!message.content.startsWith(prefix) || message.author.bot) return
+    if (!message.content.startsWith(prefix)) return
 
 	const args = message.content.slice(prefix.length).trim().split(/ +/)
     const commandName = args.shift().toLowerCase()
@@ -76,8 +83,9 @@ client.on('message', message => {
 
     // 執行指令
 	try {
-        command.execute(message, args)
+        command.callback(message, args)
         message.delete({ timeout: 5000 })
+            .catch(() => console.log(`[${getTime()}]${text.error}找不到要刪除的訊息`))
 	} catch (error) {
 		console.error(error)
 	}

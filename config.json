@@ -5,8 +5,8 @@
     "randomActivity": {
         "enable": true,
         "type": "COMPETING",
-        "status": ["NekoChan 的 肉便器", "NekoChan 的 性奴隸", "NekoChan 的 小母狗", "NekoChan 的 飛機杯"],
-        "switchTime": 5
+        "status": ["NekoChan 的 肉便器", "NekoChan 的 性奴隸", "NekoChan 的 小母狗", "NekoChan 的 飛機杯", "泡槍仔 小ㄐㄐ", "渣醬麵 臭渣男"],
+        "switchTime": 60
     },
 
     "nHentai": {
@@ -20,11 +20,52 @@
             "shortCommand": "r",
             "Blacklist": {
                 "enable": true,
-                "tags": ["futanari", "scat", "pig man", "ryona", "coprohagia", "spider girl", "alien", "pig girl", "nipple fuck", "males only", "pig", "yaoi", "insect", "guro", "cannibalism", "eggs", "big breasts", "drugs", "pregnant", "bestiality"],
+                "tags": ["futanari", "scat", "pig man", "ryona", "coprohagia", "spider girl", "alien", "pig girl", "nipple fuck", "males only", "pig", "yaoi", "insect", "guro", "cannibalism", "eggs", "big breasts", "drugs", "pregnant", "bestiality", "robot"],
                 "artists": ["sakamoto kafka"],
                 "languages": ["english", "japanese"]
             }
+        },
+        "randomBookTime": {
+            "enable": true,
+            "channel": "809625785006424074",
+            "sendSecTime": "600"
         }
+    },
+
+    "images": {
+        "idk": [
+            "https://i.imgur.com/J5xoyPP.png"
+        ],
+        "heal": [
+            "https://i.imgur.com/yLfsmbm.png",
+            "https://i.imgur.com/FjCo4eV.png",
+            "https://i.imgur.com/2lpe008.png",
+            "https://i.imgur.com/NVV8H4B.png",
+            "https://i.imgur.com/rKiNyF8.png",
+            "https://i.imgur.com/ZP3rs6E.png",
+            "https://i.imgur.com/GW6HkIZ.png",
+            "https://i.imgur.com/4de6jQX.png",
+            "https://i.imgur.com/7Z4HoxL.png",
+            "https://i.imgur.com/NiVeJgl.png",
+            "https://i.imgur.com/14OnYFa.png"
+        ],
+        "lie": [
+            "https://i.imgur.com/MNxo5QB.jpg",
+            "https://i.imgur.com/uOLsmAP.jpg",
+            "https://i.imgur.com/xw1wDKk.png",
+            "https://i.imgur.com/SMFduGe.jpg",
+            "https://i.imgur.com/Ak8O4cy.jpg",
+            "https://i.imgur.com/UwaTAY6.jpg",
+            "https://i.imgur.com/MygHlAh.jpg",
+            "https://i.imgur.com/AX6kEO5.jpg",
+            "https://i.imgur.com/loghAAl.png",
+            "https://i.imgur.com/loghAAl.png",
+            "https://i.imgur.com/ORwNLjd.png",
+            "https://i.imgur.com/0vJoLgR.png",
+            "https://i.imgur.com/qYk2Ovn.png",
+            "https://i.imgur.com/BKnurQL.png",
+            "https://i.imgur.com/qmIYSt2.png"
+        ]
     },
 
     "text": {
