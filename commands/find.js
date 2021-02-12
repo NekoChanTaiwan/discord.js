@@ -17,14 +17,12 @@ let saveMsg = null,
     language = ''
 
 module.exports = {
-	name: 'find',
+	name: nHentai.find.command,
 	cooldown: 10,
     args: true,
 	execute(message, args) {
-		// 格式正確
         let id = ''
         for (let i = 0; i < args[0].length; i++) {
-            // console.log(args[0][i])
             id += args[0][i]
         }
 
@@ -69,7 +67,7 @@ module.exports = {
 
             saveMsg.delete() // 刪除通知訊息
                 .then(() => {
-                    nHentaiEmbed(book.title.pretty, book.id, artistName, artistUrl, blacklistEnable, language, tagsName, book.num_pages, nHentai.find.name, prefix, ` ${book.id}`, book.media_id, message)
+                    nHentaiEmbed(book.title.pretty, book.id, artistName, artistUrl, blacklistEnable, language, tagsName, book.num_pages, nHentai.find.name, prefix, `${nHentai.find.command} ${book.id}`, book.media_id, message)
                 })
 
 

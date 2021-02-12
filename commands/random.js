@@ -18,7 +18,7 @@ let saveMsg = null,
     language = ''
 
 module.exports = {
-	name: 'random',
+	name: nHentai.random.command,
     description: 'nHentai 隨機本本',
 	cooldown: 10,
 	execute(message) {

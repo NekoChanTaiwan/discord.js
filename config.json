@@ -11,7 +11,8 @@
 
     "nHentai": {
         "find": {
-            "name":"nHentai - 尋找本本"
+            "name":"nHentai - 尋找本本",
+            "command": "find"
         },
         "random": {
             "name": "nHentai - 隨機本本",
